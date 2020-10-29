@@ -3,3 +3,4 @@ RecycleAppBackend/node_modules
 .vscode
 RecycleAppBackend/.env
 .git
+.gitignore
