@@ -59,7 +59,7 @@ app.get("/api/products/:id", (req, res, next) => {
 // create new product
 app.post("/api/products/", (req, res, next) => {
     let errors=[]
-    if (!req.body.DateOfPurchase){
+    if (!req.body.dateOfPurchase){
         errors.push("No date of purchase specified");
     }
     if (errors.length){
@@ -67,30 +67,30 @@ app.post("/api/products/", (req, res, next) => {
         return;
     }
     const data = {
-        origin: req.body.Origin,
-        dateOfPurchase: req.body.DateOfPurchase,
-        purchasePrice : req.body.PurchasePrice,
-        frameSize: req.body.FrameSize,
-        bicycleType: req.body.BicycleType,
-        brand: req.body.Brand,
-        gears: req.body.Gears,
-        color: req.body.Color,
-        comment: req.body.Comment,
-        count: req.body.Count,
-        frameNumber: req.body.FrameNumber
+        origin: req.body.origin,
+        dateOfPurchase: req.body.dateOfPurchase,
+        purchasePrice : req.body.purchasePrice,
+        frameSize: req.body.frameSize,
+        bicycleType: req.body.bicycleType,
+        brand: req.body.brand,
+        gears: req.body.gears,
+        color: req.body.color,
+        comment: req.body.comment,
+        count: req.body.count,
+        frameNumber: req.body.frameNumber
     }
-    var sql ='INSERT INTO Products (Origin, \
+    const sql ='INSERT INTO Products (origin, \
                                     dateOfPurchase, \
-                                    PurchasePrice, \
-                                    FrameSize, \
-                                    BicycleType, \
-                                    Brand, \
-                                    Gears, \
-                                    Color, \
-                                    Comment, \
-                                    Count, \
-                                    FrameNumber) VALUES (?,?,?,?,?,?,?,?,?,?,?)'
-    var params =[
+                                    purchasePrice, \
+                                    frameSize, \
+                                    bicycleType, \
+                                    brand, \
+                                    gears, \
+                                    color, \
+                                    comment, \
+                                    count, \
+                                    frameNumber) VALUES (?,?,?,?,?,?,?,?,?,?,?)'
+    const params =[
             data.origin,
             data.dateOfPurchase,
             data.purchasePrice,
@@ -102,6 +102,7 @@ app.post("/api/products/", (req, res, next) => {
             data.comment,
             data.count,
             data.frameNumber]
+
     db.run(sql, params, function (err, result) {
         if (err){
             res.status(400).json({"error": err.message})
@@ -114,6 +115,75 @@ app.post("/api/products/", (req, res, next) => {
         })
     });
 })
+
+// Update product
+app.patch("/api/products/:id", (req, res, next) => {
+    const data = {
+        origin: req.body.origin,
+        dateOfPurchase: req.body.dateOfPurchase,
+        purchasePrice : req.body.purchasePrice,
+        frameSize: req.body.frameSize,
+        bicycleType: req.body.bicycleType,
+        brand: req.body.brand,
+        gears: req.body.gears,
+        color: req.body.color,
+        comment: req.body.comment,
+        count: req.body.count,
+        frameNumber: req.body.frameNumber
+    }
+    const sql = 
+        `UPDATE products set 
+        origin = COALESCE(?,origin), 
+        dateOfPurchase = COALESCE(?,dateOfPurchase), 
+        purchasePrice = COALESCE(?,purchasePrice),
+        frameSize = COALESCE(?,frameSize),
+        bicycleType = COALESCE(?,bicycleType),
+        brand = COALESCE(?,brand),
+        gears = COALESCE(?,gears),
+        color = COALESCE(?,color),
+        comment = COALESCE(?,comment),
+        count = COALESCE(?,count),
+        frameNumber = COALESCE(?,frameNumber),
+        WHERE id = ?`
+    const params =[
+        data.origin,
+        data.dateOfPurchase,
+        data.purchasePrice,
+        data.frameSize,
+        data.bicycleType,
+        data.brand,
+        data.gears,
+        data.color,
+        data.comment,
+        data.count,
+        data.frameNumber]
+    db.run(sql, params, function (err, result) {
+            if (err){
+                res.status(400).json({"error": res.message})
+                return;
+            }
+            res.json({
+                message: "success",
+                data: data,
+                changes: this.changes
+            })
+    });
+})
+
+// Delete product
+app.delete("/api/products/:id", (req, res, next) => {
+    db.run(
+        'DELETE FROM Products WHERE id = ?',
+        req.params.id,
+        function (err, result) {
+            if (err){
+                res.status(400).json({"error": res.message})
+                return;
+            }
+            res.json({"message":"deleted", changes: this.changes})
+    });
+})
+
 
 // Default response for any other request
 app.use((req, res) => {
