@@ -1,5 +1,5 @@
 RecycleAppFrontend/node_modules
-
+RecycleAppBackend/node_modules
 .vscode
-.env
+RecycleAppBackend/.env
 .git
